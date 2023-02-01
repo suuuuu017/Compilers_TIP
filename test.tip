@@ -1,9 +1,48 @@
-iterate(n) {
-    var f;
-    f = 1;
-    while (n>0) {
-        f = f*n;
-        n = n-1;
+foo(p,x) {
+    var f,q;
+    if (*p==0) { f=1; }
+    else {
+    q = alloc 10;
+    *q = (*p)-1;
+    f=(*p)*(x(q,x));
     }
-    return f;
+return f;
+}
+
+
+foo2(i) {
+    return i+1;
+}
+
+main() {
+
+    var a,b,c,d,h,t,n,i,j,k,l,x,y,z,w;
+    w = input;
+    a = {f:3, g:17};
+    b = a.f;
+    c = {f:alloc 5, h:15};
+    d = c.f;
+
+    i = {f:null, g:17};
+    j = alloc {g:42, h:87};
+    i.f = j;
+    (*j).g = 117;
+    k = (*(i.f)).g;
+
+    x = alloc null;
+    y = &x;
+    *x = &y;
+    z = **y;
+
+    output 1;
+
+    t = null;
+    n = 42;
+    while (n>0) {
+      n = n-1;
+      h = alloc null;
+      *h = t;
+      t = h;
+    }
+    return foo2(n);
 }

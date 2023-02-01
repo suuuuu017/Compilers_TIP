@@ -119,8 +119,7 @@ class TypeAnalysis(program: AProgram)(implicit declData: DeclarationData) extend
         }
       case bin: ABinaryOp =>
         bin.operator match {
-          case Eqq => unify(bin.left, IntType());
-          unify(bin.right, IntType());
+          case Eqq => unify(bin, IntType());
           unify(bin.left, bin.right)// <--- Complete here
           case _ => unify(bin.left, IntType());
           unify(bin.right, IntType());
