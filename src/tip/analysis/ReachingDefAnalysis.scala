@@ -11,9 +11,9 @@ import tip.cfg.CfgOps._
 import scala.collection.immutable.Set
 
 /**
-  * Base class for live variables analysis.
-  */
-abstract class LiveVarsAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData) extends FlowSensitiveAnalysis(false) {
+ * Base class for live variables analysis.
+ */
+abstract class ReachingDefAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData) extends FlowSensitiveAnalysis(false) {
 
   val lattice: MapLattice[CfgNode, PowersetLattice[ADeclaration]] = new MapLattice(new PowersetLattice())
 
@@ -24,18 +24,13 @@ abstract class LiveVarsAnalysis(cfg: IntraproceduralProgramCfg)(implicit declDat
 
   def transfer(n: CfgNode, s: lattice.sublattice.Element): lattice.sublattice.Element =
     n match {
-      case _: CfgFunExitNode => lattice.sublattice.bottom
       case r: CfgStmtNode =>
         r.data match {
-          case cond: AExpr => s ++ r.appearingIds //<--- Complete here
           case as: AAssignStmt =>
             as.left match {
               case id: AIdentifier => s -- r.appearingIds ++ as.right.appearingIds //<--- Complete here JOIN(v) \ {x} ∪ vars(E)
               case _ => ???
             }
-          case varr: AVarStmt => s -- varr.declIds //<--- Complete here
-          case ret: AReturnStmt => s ++ r.appearingIds //<--- Complete here #TODO: check with TA
-          case out: AOutputStmt => s ++ r.appearingIds //<--- Complete here
           case _ => s
         }
       case _ => s
@@ -43,17 +38,17 @@ abstract class LiveVarsAnalysis(cfg: IntraproceduralProgramCfg)(implicit declDat
 }
 
 /**
-  * Live variables analysis that uses the simple fixpoint solver.
-  */
-class LiveVarsAnalysisSimpleSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
-    extends LiveVarsAnalysis(cfg)
+ * Live variables analysis that uses the simple fixpoint solver.
+ */
+class ReachingDefAnalysisSimpleSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
+  extends ReachingDefAnalysis(cfg)
     with SimpleMapLatticeFixpointSolver[CfgNode]
     with BackwardDependencies
 
 /**
-  * Live variables analysis that uses the worklist solver.
-  */
-class LiveVarsAnalysisWorklistSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
-    extends LiveVarsAnalysis(cfg)
+ * Live variables analysis that uses the worklist solver.
+ */
+class ReachingDefAnalysisWorklistSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
+  extends ReachingDefAnalysis(cfg)
     with SimpleWorklistFixpointSolver[CfgNode]
     with BackwardDependencies
