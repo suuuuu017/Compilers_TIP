@@ -13,9 +13,9 @@ import scala.collection.immutable.Set
 /**
  * Base class for live variables analysis.
  */
-abstract class ReachingDefAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData) extends FlowSensitiveAnalysis(false) {
+abstract class ReachingDefAnalysis(cfg: IntraproceduralProgramCfg) extends FlowSensitiveAnalysis(true) {
 
-  val lattice: MapLattice[CfgNode, PowersetLattice[ADeclaration]] = new MapLattice(new PowersetLattice())
+  val lattice: MapLattice[CfgNode, PowersetLattice[AAssignStmt]] = new MapLattice(new PowersetLattice())
 
   val domain: Set[CfgNode] = cfg.nodes
 
@@ -28,8 +28,13 @@ abstract class ReachingDefAnalysis(cfg: IntraproceduralProgramCfg)(implicit decl
         r.data match {
           case as: AAssignStmt =>
             as.left match {
-              case id: AIdentifier => s -- r.appearingIds ++ as.right.appearingIds //<--- Complete here JOIN(v) \ {x} ∪ vars(E)
-              case _ => ???
+              case ass: AIdentifier =>
+                s.filter(x =>
+                  x.left match {
+                    case id: AIdentifier => id.name != ass.name
+                    case _ => true
+                  }) ++ Set(as);
+              case _ => s
             }
           case _ => s
         }
@@ -40,15 +45,15 @@ abstract class ReachingDefAnalysis(cfg: IntraproceduralProgramCfg)(implicit decl
 /**
  * Live variables analysis that uses the simple fixpoint solver.
  */
-class ReachingDefAnalysisSimpleSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
+class ReachingDefAnalysisSimpleSolver(cfg: IntraproceduralProgramCfg)
   extends ReachingDefAnalysis(cfg)
     with SimpleMapLatticeFixpointSolver[CfgNode]
-    with BackwardDependencies
+    with ForwardDependencies
 
 /**
  * Live variables analysis that uses the worklist solver.
  */
-class ReachingDefAnalysisWorklistSolver(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
+class ReachingDefAnalysisWorklistSolver(cfg: IntraproceduralProgramCfg)
   extends ReachingDefAnalysis(cfg)
     with SimpleWorklistFixpointSolver[CfgNode]
-    with BackwardDependencies
+    with ForwardDependencies
