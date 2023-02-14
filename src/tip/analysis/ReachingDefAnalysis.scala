@@ -10,6 +10,8 @@ import tip.cfg.CfgOps._
 
 import scala.collection.immutable.Set
 
+//dot -Tpng -o test.png /Users/suuuuu017/Documents/UVA_2022-2023_Spring/TIP/out/liveness.tip__livevars.dot
+
 /**
  * Base class for live variables analysis.
  */
