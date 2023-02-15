@@ -148,7 +148,7 @@ class PowersetLattice[A] extends Lattice {
 
   val bottom: Element = Set() //<--- Complete here
 
-  def lub(x: Element, y: Element): Element = x ++ y//<--- Complete here #TODO: check with TA
+  def lub(x: Element, y: Element): Element = x ++ y//<--- Complete here
 }
 
 /**
